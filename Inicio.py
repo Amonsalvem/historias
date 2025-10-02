@@ -111,7 +111,7 @@ if canvas_result.image_data is not None and api_key and analyze_button:
             message_placeholder.markdown(full_response)
             
             # Guardar en session_state
-            st.session_state.full_response = full_response
+            st🦇session_state.full_response = full_response
             st.session_state.analysis_done = True
             
             if Expert== profile_imgenh:
@@ -125,7 +125,7 @@ if st.session_state.analysis_done:
     st.divider()
     st.subheader("📚 ¿Quieres crear una historia?")
     
-    if st.button("✨ Crear historia de miedo"):
+    if st.button("Crear historia de miedo"):
         with st.spinner("Creando historia..."):
             story_prompt = f"Basándote en esta descripción: '{st.session_state.full_response}', crea una historia de miedo entretenida. La historia debe ser de miedo."
             
