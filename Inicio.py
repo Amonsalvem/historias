@@ -72,7 +72,7 @@ os.environ['OPENAI_API_KEY'] = ke
 api_key = os.environ['OPENAI_API_KEY']
 client = OpenAI(api_key=api_key)
 
-🔮 Botón para análisis
+Botón para análisis
 
 analyze_button = st.button(" Revela mi futuro", type="primary")
 
