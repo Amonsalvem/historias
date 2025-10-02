@@ -29,12 +29,12 @@ def encode_image_to_base64(image_path):
 
 
 # Streamlit 
-    st.set_page_config(page_title='Historias de Miedo')
-st.title('Historias de Miedo')
+st.set_page_config(page_title='Tablero Inteligente')
+st.title('Tablero Inteligente')
 with st.sidebar:
     st.subheader("Acerca de:")
     st.subheader("En esta aplicación veremos la capacidad que ahora tiene una máquina de interpretar un boceto")
-st.subheader("Dibuja el boceto en el panel y presiona el botón para obtener tu historia de miedo")
+st.subheader("Dibuja el boceto en el panel y presiona el botón para analizarla")
 
 # Add canvas component
 drawing_mode = "freedraw"
@@ -111,7 +111,7 @@ if canvas_result.image_data is not None and api_key and analyze_button:
             message_placeholder.markdown(full_response)
             
             # Guardar en session_state
-            stsession_state.full_response = full_response
+            st.session_state.full_response = full_response
             st.session_state.analysis_done = True
             
             if Expert== profile_imgenh:
@@ -125,9 +125,9 @@ if st.session_state.analysis_done:
     st.divider()
     st.subheader("📚 ¿Quieres crear una historia?")
     
-    if st.button("Crear historia de miedo"):
+    if st.button("✨ Crear historia infantil"):
         with st.spinner("Creando historia..."):
-            story_prompt = f"Basándote en esta descripción: '{st.session_state.full_response}', crea una historia de miedo entretenida. La historia debe ser de miedo."
+            story_prompt = f"Basándote en esta descripción: '{st.session_state.full_response}', crea una historia infantil breve y entretenida. La historia debe ser creativa y apropiada para niños."
             
             story_response = openai.chat.completions.create(
                 model="gpt-4o-mini",
