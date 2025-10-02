@@ -136,7 +136,7 @@ if canvas_result.image_data is not None and api_key and analyze_button:
 # ============================
 if st.session_state.analysis_done:
     st.divider()
-    st.subheader("Tu destino revelado:")
+    st.subheader("𓁻 Tu destino revelado 𓁻")
     st.markdown(f"{st.session_state.full_response}")
 
     # Generar consejo del destino
@@ -159,7 +159,7 @@ if st.session_state.analysis_done:
             consejo_texto = f"No se pudo obtener un consejo del destino: {e}"
 
     st.divider()
-    st.subheader("Consejo del destino:")
+    st.subheader("⋆.˚Consejo del destino⋆.˚")
     st.markdown(consejo_texto)
 
 if not api_key:
