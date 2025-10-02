@@ -138,5 +138,28 @@ if st.session_state.analysis_done:
     st.subheader("Tu destino revelado:")
     st.markdown(f"{st.session_state.full_response}")
 
+    # Generar consejo del destino
+    with st.spinner("Consultando un consejo del destino..."):
+        consejo_prompt = (
+            f"Basado en esta predicción del futuro: '{st.session_state.full_response}', "
+            "genera un consejo espiritual y enigmático. "
+            "El consejo debe ser breve, inspirador y sonar como una guía del destino. "
+            "Usa metáforas y un tono místico."
+        )
+
+        try:
+            consejo_response = openai.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[{"role": "user", "content": consejo_prompt}],
+                max_tokens=200,
+            )
+            consejo_texto = consejo_response.choices[0].message.content
+        except Exception as e:
+            consejo_texto = f"No se pudo obtener un consejo del destino: {e}"
+
+    st.divider()
+    st.subheader("Consejo del destino:")
+    st.markdown(consejo_texto)
+
 if not api_key:
     st.warning("Por favor, ingresa tu Clave Mágica para invocar al Oráculo.")
