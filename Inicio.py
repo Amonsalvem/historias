@@ -49,7 +49,7 @@ with st.sidebar:
 st.subheader("⚙️ Herramientas de tu destino")
 stroke_width = st.slider('📏 Grosor de la pluma', 1, 30, 5)
 stroke_color = st.color_picker("🎨 Color de tu energía", "#000000")
-bg_color = st.color_picker("🌌 Color del universo", "#FFFFFF")
+bg_color = st.color_picker(" Color del universo", "#FFFFFF")
 
 🎨 Canvas para dibujar
 
