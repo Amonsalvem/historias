@@ -125,7 +125,7 @@ if st.session_state.analysis_done:
     st.divider()
     st.subheader("📚 ¿Quieres crear una historia?")
     
-    if st.button("✨ Crear historia infantil"):
+    if st.button("✨ Crear historia de miedo"):
         with st.spinner("Creando historia..."):
             story_prompt = f"Basándote en esta descripción: '{st.session_state.full_response}', crea una historia infantil breve y entretenida. La historia debe ser de miedo."
             
