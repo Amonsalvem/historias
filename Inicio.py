@@ -38,15 +38,14 @@ def encode_image_to_base64(image_path):
 # Interfaz principal
 # ============================
 st.set_page_config(page_title='Tablero Místico', layout="wide")
-st.title('Tablero Místico de Predicciones')
+st.title(' ꩜ Tablero Místico de Predicciones ꩜ ')
 
 st.markdown("""
-꩜ Bienvenido/a al Oráculo Digital ꩜
+Bienvenido/a al Oráculo Digital
 Lo que traces aquí no será un simple dibujo...  
-Cada línea, cada trazo y cada forma revelará lo oculto en tu mente, y con ello... tu destino.  
+Cada línea, cada trazo y cada forma revelará algo oculto en tu mente, y con ello... tu destino.  
 
-Dibuja sin pensar, deja que tu intuición guíe tu mano.  
-Cuando estés listo, pide al tablero que revele lo que el futuro guarda para ti.
+Dibuja sin pensar y cuando estés listo, pide al tablero que revele lo que el futuro guarda para ti.
 """)
 
 # ============================
@@ -56,7 +55,7 @@ with st.sidebar:
     st.subheader("Herramientas de tu destino")
     stroke_width = st.slider('Grosor de la pluma', 1, 30, 5)
     stroke_color = st.color_picker("Color de tu energía", "#000000")
-    bg_color = st.color_picker("Color del universo", "#FFFFFF")
+    bg_color = st.color_picker("Color de tu universo", "#FFFFFF")
 
 # ============================
 # Canvas para dibujar
