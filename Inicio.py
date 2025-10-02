@@ -111,7 +111,7 @@ if canvas_result.image_data is not None and api_key and analyze_button:
             message_placeholder.markdown(full_response)
             
             # Guardar en session_state
-            st🦇session_state.full_response = full_response
+            stsession_state.full_response = full_response
             st.session_state.analysis_done = True
             
             if Expert== profile_imgenh:
