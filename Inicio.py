@@ -42,10 +42,11 @@ st.title(' ꩜ Tablero Místico de Predicciones ꩜ ')
 
 st.markdown("""
 Bienvenido/a al Oráculo Digital
-Lo que traces aquí no será un simple dibujo...  
+✶✶✶ Lo que traces aquí no será un simple dibujo...  
 Cada línea, cada trazo y cada forma revelará algo oculto en tu mente, y con ello... tu destino.  
 
 Dibuja sin pensar y cuando estés listo, pide al tablero que revele lo que el futuro guarda para ti.
+✩₊˚.⋆☾𓃦☽⋆⁺₊✧
 """)
 
 # ============================
