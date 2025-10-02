@@ -29,7 +29,7 @@ return encoded_image
 except FileNotFoundError:
 return "Error: La imagen no se encontró en la ruta especificada."
 
-🌌 Interfaz principal
+Interfaz principal
 
 st.set_page_config(page_title=' Tablero Místico', layout="wide")
 st.title(' Tablero Místico de Predicciones')
