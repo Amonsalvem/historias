@@ -31,8 +31,8 @@ return "Error: La imagen no se encontró en la ruta especificada."
 
 🌌 Interfaz principal
 
-st.set_page_config(page_title='🔮 Tablero Místico', layout="wide")
-st.title('🔮 Tablero Místico de Predicciones')
+st.set_page_config(page_title=' Tablero Místico', layout="wide")
+st.title(' Tablero Místico de Predicciones')
 
 st.markdown("""
 ✨ Bienvenido/a al Oráculo Digital ✨
@@ -47,11 +47,11 @@ Cuando estés listo, pide al tablero que revele lo que el futuro guarda para ti.
 
 with st.sidebar:
 st.subheader("⚙️ Herramientas de tu destino")
-stroke_width = st.slider('📏 Grosor de la pluma', 1, 30, 5)
-stroke_color = st.color_picker("🎨 Color de tu energía", "#000000")
+stroke_width = st.slider('Grosor de la pluma', 1, 30, 5)
+stroke_color = st.color_picker("Color de tu energía", "#000000")
 bg_color = st.color_picker(" Color del universo", "#FFFFFF")
 
-🎨 Canvas para dibujar
+ Canvas para dibujar
 
 drawing_mode = "freedraw"
 canvas_result = st_canvas(
@@ -65,16 +65,16 @@ drawing_mode=drawing_mode,
 key="canvas",
 )
 
-🔑 API Key
+ API Key
 
-ke = st.text_input('🔑 Ingresa tu Clave Mágica (API Key)', type="password")
+ke = st.text_input(' Ingresa tu Clave Mágica (API Key)', type="password")
 os.environ['OPENAI_API_KEY'] = ke
 api_key = os.environ['OPENAI_API_KEY']
 client = OpenAI(api_key=api_key)
 
 🔮 Botón para análisis
 
-analyze_button = st.button("🔮 Revela mi futuro", type="primary")
+analyze_button = st.button(" Revela mi futuro", type="primary")
 
 if canvas_result.image_data is not None and api_key and analyze_button:
 
@@ -130,4 +130,4 @@ st.subheader("🌙 Tu destino revelado:")
 st.markdown(f"✨ {st.session_state.full_response} ✨")
 
 if not api_key:
-st.warning("⚠️ Ingresa tu Clave Mágica para invocar al Oráculo.")
+st.warning(" Ingresa tu Clave Mágica para invocar al Oráculo.")
