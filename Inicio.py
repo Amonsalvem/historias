@@ -29,12 +29,12 @@ def encode_image_to_base64(image_path):
 
 
 # Streamlit 
-st.set_page_config(page_title='Tablero Inteligente')
+    st.set_page_config(page_title='Historias de Miedo')
 st.title('Tablero Inteligente')
 with st.sidebar:
     st.subheader("Acerca de:")
     st.subheader("En esta aplicación veremos la capacidad que ahora tiene una máquina de interpretar un boceto")
-st.subheader("Dibuja el boceto en el panel y presiona el botón para analizarla")
+st.subheader("Dibuja el boceto en el panel y presiona el botón para obtener tu historia de miedo")
 
 # Add canvas component
 drawing_mode = "freedraw"
@@ -127,7 +127,7 @@ if st.session_state.analysis_done:
     
     if st.button("✨ Crear historia infantil"):
         with st.spinner("Creando historia..."):
-            story_prompt = f"Basándote en esta descripción: '{st.session_state.full_response}', crea una historia infantil breve y entretenida. La historia debe ser creativa y apropiada para niños."
+            story_prompt = f"Basándote en esta descripción: '{st.session_state.full_response}', crea una historia infantil breve y entretenida. La historia debe ser de miedo."
             
             story_response = openai.chat.completions.create(
                 model="gpt-4o-mini",
