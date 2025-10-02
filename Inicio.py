@@ -35,7 +35,7 @@ st.set_page_config(page_title=' Tablero Místico', layout="wide")
 st.title(' Tablero Místico de Predicciones')
 
 st.markdown("""
-✨ Bienvenido/a al Oráculo Digital ✨
+ Bienvenido/a al Oráculo Digital 
 Lo que traces aquí no será un simple dibujo...
 Cada línea, cada trazo y cada forma revelará lo oculto en tu mente, y con ello... tu destino.
 
@@ -43,7 +43,7 @@ Dibuja sin pensar, deja que tu intuición guíe tu mano.
 Cuando estés listo, pide al tablero que revele lo que el futuro guarda para ti.
 """)
 
-🎨 Panel lateral
+Panel lateral
 
 with st.sidebar:
 st.subheader("⚙️ Herramientas de tu destino")
