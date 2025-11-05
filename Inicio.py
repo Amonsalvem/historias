@@ -1,166 +1,215 @@
 import os
-import streamlit as st
 import base64
-from openai import OpenAI
-import openai
-from PIL import Image
 import numpy as np
+from PIL import Image
+import streamlit as st
 from streamlit_drawable_canvas import st_canvas
+from openai import OpenAI
 
 # ============================
-# Variables
+# Helpers
 # ============================
-Expert = " "
-profile_imgenh = " "
+def encode_image_to_base64(image_path: str) -> str:
+    with open(image_path, "rb") as f:
+        return base64.b64encode(f.read()).decode("utf-8")
+
+def get_api_key() -> str:
+    # Prioridad: Secrets → input
+    if "OPENAI_API_KEY" in st.secrets:
+        return st.secrets["OPENAI_API_KEY"]
+    return st.session_state.get("typed_key", "")
 
 # ============================
-# Inicializar session_state
+# Estado
 # ============================
-if 'analysis_done' not in st.session_state:
+if "analysis_done" not in st.session_state:
     st.session_state.analysis_done = False
-if 'full_response' not in st.session_state:
+if "full_response" not in st.session_state:
     st.session_state.full_response = ""
-if 'base64_image' not in st.session_state:
+if "base64_image" not in st.session_state:
     st.session_state.base64_image = ""
+if "typed_key" not in st.session_state:
+    st.session_state.typed_key = ""
 
 # ============================
-# Función para convertir imagen a Base64
+# Page / Theme
 # ============================
-def encode_image_to_base64(image_path):
-    try:
-        with open(image_path, "rb") as image_file:
-            encoded_image = base64.b64encode(image_file.read()).decode("utf-8")
-            return encoded_image
-    except FileNotFoundError:
-        return "Error: La imagen no se encontró en la ruta especificada."
+st.set_page_config(page_title="Tablero Místico", layout="wide", initial_sidebar_state="collapsed")
 
-# ============================
-# Interfaz principal
-# ============================
-st.set_page_config(page_title='Tablero Místico', layout="wide")
-st.title(' ꩜ Tablero Místico de Predicciones ꩜ ')
-
+# CSS dark minimal (negro/blanco)
 st.markdown("""
-Bienvenido/a al Oráculo Digital
-✶✶✶ Lo que traces aquí no será un simple dibujo...  
-Cada línea, cada trazo y cada forma revelará algo oculto en tu mente, y con ello... tu destino.  
-
-Dibuja sin pensar y cuando estés listo, pide al tablero que revele lo que el futuro guarda para ti.
-✩₊˚.⋆☾𓃦☽⋆⁺₊✧
-""")
-
-# ============================
-# Panel lateral
-# ============================
-with st.sidebar:
-    st.subheader("Herramientas de tu destino")
-    stroke_width = st.slider('Grosor de la pluma', 1, 30, 5)
-    stroke_color = st.color_picker("Color de tu energía", "#000000")
-    bg_color = st.color_picker("Color de tu universo", "#FFFFFF")
-
-# ============================
-# Canvas para dibujar
-# ============================
-drawing_mode = "freedraw"
-canvas_result = st_canvas(
-    fill_color="rgba(255, 165, 0, 0.3)",
-    stroke_width=stroke_width,
-    stroke_color=stroke_color,
-    background_color=bg_color,
-    height=350,
-    width=450,
-    drawing_mode=drawing_mode,
-    key="canvas",
-)
+<style>
+:root { --bg: #000000; --fg: #ffffff; --muted:#bdbdbd; --card:#0a0a0a; --border:#1f1f1f;}
+html, body, [data-testid="stAppViewContainer"] { background: var(--bg) !important; color: var(--fg) !important; }
+h1,h2,h3,h4,h5,h6, p, label, span, div, code { color: var(--fg) !important; }
+[data-testid="stSidebar"] { background: var(--bg) !important; border-left: 1px solid var(--border); }
+[data-baseweb="select"] > div, .stTextInput>div>div>input, textarea, .stTextArea textarea,
+.stColorPicker, .stSlider, .stFileUploader, .stCheckbox, .stTextInput>div>div,
+.stButton>button { color: var(--fg) !important; }
+.stTextInput>div>div>input, textarea, .stTextArea textarea {
+    background:#0b0b0b !important; border:1px solid var(--border) !important; border-radius:12px; }
+.stButton>button {
+    background: transparent !important; color: var(--fg) !important;
+    border:1px solid var(--fg) !important; border-radius:999px !important;
+    padding:0.6rem 1.2rem; transition: all .2s ease;
+}
+.stButton>button:hover { transform: translateY(-1px); box-shadow: 0 0 0 2px #ffffff22 inset; }
+.block-card {
+    background: var(--card); border:1px solid var(--border); border-radius:18px; padding:18px;
+}
+hr { border-color: var(--border) !important; }
+.small { color: var(--muted) !important; font-size:0.9rem; }
+.center { display:flex; align-items:center; justify-content:center; }
+.kicker { letter-spacing:.08em; text-transform:uppercase; font-size:.75rem; color:var(--muted); }
+</style>
+""", unsafe_allow_html=True)
 
 # ============================
-# API Key
+# Header
 # ============================
-ke = st.text_input('Ingresa tu Clave Mágica (API Key)', type="password")
-os.environ['OPENAI_API_KEY'] = ke
-api_key = os.environ['OPENAI_API_KEY']
-client = OpenAI(api_key=api_key)
+st.markdown('<div class="kicker">Oráculo Digital</div>', unsafe_allow_html=True)
+st.markdown("<h1>꩜ Tablero Místico de Predicciones ꩜</h1>", unsafe_allow_html=True)
+st.caption("Dibuja sobre el lienzo negro. El oráculo leerá tus trazos y revelará lo oculto.")
 
 # ============================
-# Botón para análisis
+# API Key (Input inline, negro)
 # ============================
-analyze_button = st.button("Revela mi futuro")
+with st.container():
+    col_k1, col_k2 = st.columns([4,1])
+    with col_k1:
+        typed_key = st.text_input("Ingresa tu Clave Mágica (API Key) — usa Secrets si es posible",
+                                  type="password", placeholder="sk-proj-…",
+                                  key="typed_key",
+                                  label_visibility="collapsed")
+    with col_k2:
+        st.markdown('<div class="small center" style="height:38px;">'
+                    '🔒 Se prefiere usar <b>Secrets</b> en Deploy</div>', unsafe_allow_html=True)
 
-if canvas_result.image_data is not None and api_key and analyze_button:
-    with st.spinner("Consultando al Oráculo..."):
-        input_numpy_array = np.array(canvas_result.image_data)
-        input_image = Image.fromarray(input_numpy_array.astype('uint8')).convert('RGBA')
-        input_image.save('img.png')
+api_key = get_api_key()
+client = OpenAI(api_key=api_key) if api_key else None
 
-        base64_image = encode_image_to_base64("img.png")
-        st.session_state.base64_image = base64_image
+# ============================
+# Lienzo + Controles
+# ============================
+st.markdown("### Lienzo")
+c1, c2 = st.columns([7,5])
 
-        prompt_text = (
-            "Eres un oráculo místico. Basado en este dibujo, interpreta el destino del usuario. "
-            "Habla en tono enigmático y espiritual, como si estuvieras revelando un secreto profundo sobre su futuro. "
-            "Predice con metáforas, símbolos y un aire de misterio."
-        )
+with c1:
+    st.markdown('<div class="block-card">', unsafe_allow_html=True)
+    drawing_mode = "freedraw"
+    # Defaults: fondo negro, trazo blanco
+    canvas_result = st_canvas(
+        fill_color="rgba(255,255,255,0.0)",
+        stroke_width=6,
+        stroke_color="#FFFFFF",
+        background_color="#000000",
+        height=420,
+        width=720,
+        drawing_mode=drawing_mode,
+        key="canvas",
+        update_streamlit=True,
+    )
+    st.markdown('</div>', unsafe_allow_html=True)
 
-        try:
-            full_response = ""
-            message_placeholder = st.empty()
-            response = openai.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=[
-                    {
+with c2:
+    st.markdown('<div class="block-card">', unsafe_allow_html=True)
+    st.markdown("#### Ajustes")
+    stroke_width = st.slider("Grosor de la pluma", 1, 30, 6, key="stroke_w")
+    stroke_color = st.color_picker("Color del trazo", "#FFFFFF", key="stroke_c")
+    bg_color     = st.color_picker("Color del fondo", "#000000", key="bg_c")
+    # Actualiza en vivo el canvas:
+    if canvas_result is not None:
+        pass
+    st.markdown('<hr/>', unsafe_allow_html=True)
+    ask_more = st.toggle("Añadir contexto místico", value=False)
+    user_context = ""
+    if ask_more:
+        user_context = st.text_area("Escribe señales, símbolos o sensaciones:",
+                                    placeholder="Es la primera imagen para nuestra etapa de prelanzamiento…",
+                                    height=100)
+    st.markdown('</div>', unsafe_allow_html=True)
+
+# Botón centrado
+st.write("")
+center = st.columns([1,2,1])[1]
+with center:
+    analyze_button = st.button("Revelar mi futuro")
+
+# ============================
+# Acción
+# ============================
+if analyze_button:
+    if not api_key:
+        st.error("Por favor ingresa tu Clave Mágica o configúrala en Secrets (OPENAI_API_KEY).")
+    elif canvas_result.image_data is None:
+        st.warning("Dibuja algo en el lienzo antes de invocar al Oráculo.")
+    else:
+        with st.spinner("Consultando al Oráculo…"):
+            # Guardar imagen a disco y codificar
+            input_numpy = np.array(canvas_result.image_data)
+            # Asegura 8-bit
+            img = Image.fromarray(input_numpy.astype("uint8")).convert("RGBA")
+            img.save("img.png")
+            base64_image = encode_image_to_base64("img.png")
+            st.session_state.base64_image = base64_image
+
+            prompt_text = (
+                "Eres un oráculo místico. Basado en este dibujo, interpreta el destino del usuario. "
+                "Habla en tono enigmático y espiritual, como si revelaras un secreto profundo sobre su futuro. "
+                "Usa metáforas, símbolos y un aire de misterio."
+            )
+            if user_context.strip():
+                prompt_text += f"\n\nContexto adicional del consultante:\n{user_context.strip()}"
+
+            try:
+                resp = client.chat.completions.create(
+                    model="gpt-4o-mini",
+                    messages=[{
                         "role": "user",
                         "content": [
-                            {"type": "text", "text": prompt_text},
-                            {
-                                "type": "image_url",
-                                "image_url": {"url": f"data:image/png;base64,{base64_image}"},
-                            },
+                            {"type":"text", "text": prompt_text},
+                            {"type":"image_url",
+                             "image_url":{"url": f"data:image/png;base64,{base64_image}"}}
                         ],
-                    }
-                ],
-                max_tokens=500,
-            )
-
-            if response.choices[0].message.content is not None:
-                full_response += response.choices[0].message.content
-                message_placeholder.markdown(full_response)
-
-            st.session_state.full_response = full_response
-            st.session_state.analysis_done = True
-
-        except Exception as e:
-            st.error(f"Ocurrió un error en la lectura de tu destino: {e}")
+                    }],
+                    max_tokens=500,
+                )
+                content = (resp.choices[0].message.content or "").strip()
+                st.session_state.full_response = content
+                st.session_state.analysis_done = True
+            except Exception as e:
+                st.error(f"Ocurrió un error en la lectura de tu destino: {e}")
+                st.session_state.analysis_done = False
 
 # ============================
-# Mostrar resultado
+# Resultado
 # ============================
-if st.session_state.analysis_done:
-    st.divider()
-    st.subheader("𓁻 Tu destino revelado 𓁻")
-    st.markdown(f"{st.session_state.full_response}")
+if st.session_state.analysis_done and st.session_state.full_response:
+    st.markdown("<hr/>", unsafe_allow_html=True)
+    st.markdown("### 𓁻 Tu destino revelado 𓁻")
+    st.markdown(f'<div class="block-card">{st.session_state.full_response}</div>', unsafe_allow_html=True)
 
-    # Generar consejo del destino
-    with st.spinner("Consultando un consejo del destino..."):
-        consejo_prompt = (
-            f"Basado en esta predicción del futuro: '{st.session_state.full_response}', "
-            "genera un consejo espiritual y enigmático. "
-            "El consejo debe ser breve, inspirador y sonar como una guía del destino. "
-            "Usa metáforas y un tono místico."
-        )
-
+    with st.spinner("Consultando un consejo del destino…"):
         try:
-            consejo_response = openai.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=[{"role": "user", "content": consejo_prompt}],
-                max_tokens=200,
+            consejo_prompt = (
+                f"Basado en esta predicción del futuro: '{st.session_state.full_response}', "
+                "genera un consejo espiritual y enigmático. "
+                "Debe ser breve, inspirador y sonar como una guía del destino. "
+                "Usa metáforas y un tono místico."
             )
-            consejo_texto = consejo_response.choices[0].message.content
+            consejo = client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[{"role":"user","content":consejo_prompt}],
+                max_tokens=180,
+            ).choices[0].message.content
         except Exception as e:
-            consejo_texto = f"No se pudo obtener un consejo del destino: {e}"
+            consejo = f"No se pudo obtener un consejo del destino: {e}"
 
-    st.divider()
-    st.subheader("⋆.˚Consejo del destino⋆.˚")
-    st.markdown(consejo_texto)
+    st.markdown("#### ⋆.˚ Consejo del destino ⋆.˚")
+    st.markdown(f'<div class="block-card">{consejo}</div>', unsafe_allow_html=True)
 
-if not api_key:
-    st.warning("Por favor, ingresa tu Clave Mágica para invocar al Oráculo.")
+# ============================
+# Footer
+# ============================
+st.write("")
+st.caption("Hecho para pantalla negra: tipografía blanca, acentos mínimos, foco en el contenido ✧")
